@@ -4,55 +4,52 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Driver Attendance</title>
 </head>
-<body style="font-family:sans-serif;text-align:center;">
+<body style="font-family: Arial; text-align: center; padding-top: 40px;">
+
   <h3>Driver Attendance</h3>
   <p>Please allow location access</p>
-  <button onclick="mark()">Mark Attendance</button>
 
-<script>
-  const params = new URLSearchParams(window.location.search);
-  const STORE = params.get("store");
-  const DRIVER = params.get("driver");
+  <button id="btn" onclick="markAttendance()"
+    style="padding:12px 20px;font-size:16px;">
+    Mark Attendance
+  </button>
 
-  function mark() {
-    if (!STORE || !DRIVER) {
-      alert("Invalid QR");
-      return;
-    }
+  <script>
+    const qrId = new URLSearchParams(window.location.search).get("qr_id");
 
-    if (!navigator.geolocation) {
-      alert("Location not supported");
-      return;
-    }
-
-    const btn = document.querySelector("button");
-    btn.disabled = true;
-    btn.innerText = "Marking attendance...";
-
-    navigator.geolocation.getCurrentPosition(
-      function(pos) {
-        fetch("https://script.google.com/macros/s/AKfycbxjZErxZJTQpyXkljmYLYcSg07UZT2ZQyAfZXnYs_SXcB918MzVuP7QwVD9u-usgeHA/exec", {
-          method: "POST",
-          mode: "no-cors",
-          headers: { "Content-Type": "text/plain" },
-          body: JSON.stringify({
-            store: STORE,
-            driver: DRIVER,
-            lat: pos.coords.latitude,
-            lng: pos.coords.longitude
-          })
-        });
-
-        alert("Attendance recorded");
-        btn.innerText = "Attendance marked ✅";
-      },
-      function() {
-        alert("Location permission required");
-        btn.disabled = false;
-        btn.innerText = "Mark Attendance";
+    function markAttendance() {
+      if (!qrId) {
+        alert("Invalid QR");
+        return;
       }
-    );
-  }
-</script>
+
+      const btn = document.getElementById("btn");
+      btn.disabled = true;
+      btn.innerText = "Recording...";
+
+      navigator.geolocation.getCurrentPosition(
+        pos => {
+          fetch("https://script.google.com/macros/s/AKfycbznKrCS_9lw8C9fVczJXe8rotxIeVuFQ0d9OOoQqbp2G2a62EbOksstQ-GMG2O0Rej6Qg/exec", {
+            method: "POST",
+            mode: "no-cors",
+            body: JSON.stringify({
+              qr_id: qrId,
+              lat: pos.coords.latitude,
+              lng: pos.coords.longitude
+            })
+          });
+
+          alert("Attendance recorded");
+          btn.innerText = "Done ✅";
+        },
+        () => {
+          alert("Location permission required");
+          btn.disabled = false;
+          btn.innerText = "Mark Attendance";
+        }
+      );
+    }
+  </script>
+
 </body>
 </html>
