@@ -9,52 +9,47 @@
   <p>Please allow location access</p>
   <button onclick="mark()">Mark Attendance</button>
 
- <script>
-  alert("Script loaded");
-
+<script>
   const params = new URLSearchParams(window.location.search);
   const STORE = params.get("store");
   const DRIVER = params.get("driver");
 
-  alert("Params → store=" + STORE + " driver=" + DRIVER);
-
   function mark() {
-    alert("Mark button clicked");
-
     if (!STORE || !DRIVER) {
       alert("Invalid QR");
       return;
     }
 
     if (!navigator.geolocation) {
-      alert("Geolocation not supported");
+      alert("Location not supported");
       return;
     }
 
-    alert("Requesting location");
+    const btn = document.querySelector("button");
+    btn.disabled = true;
+    btn.innerText = "Marking attendance...";
 
     navigator.geolocation.getCurrentPosition(
       function(pos) {
-        alert("Location received");
-
-        fetch("https://script.google.com/macros/s/AKfycbw9oJN0SVL4O313dHbdsG2eSA2X4kxbO_b74-zgd8JFQoXrMWl-gVZqXjrhGzUcz8lJ/exec", {
+        fetch("https://script.google.com/macros/s/AKfycbxvPJYtOwit3Tk-x53NDuc_1DV8h3lK1El05qqnk4KjdHWhmc70mRxbo7Ww5lQFp2mI/exec", {
           method: "POST",
           mode: "no-cors",
-          headers: {
-            "Content-Type": "text/plain"
-          },
+          headers: { "Content-Type": "text/plain" },
           body: JSON.stringify({
             store: STORE,
             driver: DRIVER,
             lat: pos.coords.latitude,
             lng: pos.coords.longitude
           })
-        })
-        .then(() => alert("Fetch sent"))
-        .catch(() => alert("Fetch failed"));
+        });
+
+        alert("Attendance recorded");
+        btn.innerText = "Attendance marked ✅";
       },
-      function(err) {
-        alert("Location error: " + err.message);
+      function() {
+        alert("Location permission required");
+        btn.disabled = false;
+        btn.innerText = "Mark Attendance";
       }
     );
   }
