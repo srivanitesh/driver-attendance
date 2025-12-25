@@ -9,36 +9,55 @@
   <p>Please allow location access</p>
   <button onclick="mark()">Mark Attendance</button>
 
-  <script>
-    const params = new URLSearchParams(window.location.search);
-    const STORE = params.get("store");
-    const DRIVER = params.get("driver");
+ <script>
+  alert("Script loaded");
 
-    function mark() {
-      if (!STORE || !DRIVER) {
-        alert("Invalid QR");
-        return;
-      }
+  const params = new URLSearchParams(window.location.search);
+  const STORE = params.get("store");
+  const DRIVER = params.get("driver");
 
-      navigator.geolocation.getCurrentPosition(
-        function(pos) {
-          fetch("https://script.google.com/macros/s/AKfycbw9oJN0SVL4O313dHbdsG2eSA2X4kxbO_b74-zgd8JFQoXrMWl-gVZqXjrhGzUcz8lJ/exec",{
-  method: "POST",
-  mode: "no-cors",
-  headers: {
-    "Content-Type": "text/plain"
-  },
-  body: JSON.stringify({
-    store: STORE,
-    driver: DRIVER,
-    lat: pos.coords.latitude,
-    lng: pos.coords.longitude
-  })
-})
-.then(() => alert("Attendance recorded"))
-.catch(() => alert("Unable to mark attendance")
-      );
+  alert("Params → store=" + STORE + " driver=" + DRIVER);
+
+  function mark() {
+    alert("Mark button clicked");
+
+    if (!STORE || !DRIVER) {
+      alert("Invalid QR");
+      return;
     }
-  </script>
+
+    if (!navigator.geolocation) {
+      alert("Geolocation not supported");
+      return;
+    }
+
+    alert("Requesting location");
+
+    navigator.geolocation.getCurrentPosition(
+      function(pos) {
+        alert("Location received");
+
+        fetch("YOUR_APPS_SCRIPT_URL", {
+          method: "POST",
+          mode: "no-cors",
+          headers: {
+            "Content-Type": "text/plain"
+          },
+          body: JSON.stringify({
+            store: STORE,
+            driver: DRIVER,
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude
+          })
+        })
+        .then(() => alert("Fetch sent"))
+        .catch(() => alert("Fetch failed"));
+      },
+      function(err) {
+        alert("Location error: " + err.message);
+      }
+    );
+  }
+</script>
 </body>
 </html>
