@@ -22,7 +22,7 @@
 
       navigator.geolocation.getCurrentPosition(
         function(pos) {
-          fetch("YOUR_APPS_SCRIPT_URL", {
+          fetch("https://script.google.com/macros/s/AKfycbw9oJN0SVL4O313dHbdsG2eSA2X4kxbO_b74-zgd8JFQoXrMWl-gVZqXjrhGzUcz8lJ/exec", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
