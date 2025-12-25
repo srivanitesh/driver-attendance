@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Driver Attendance</title>
+</head>
+<body style="font-family:sans-serif;text-align:center;">
+  <h3>Driver Attendance</h3>
+  <p>Please allow location access</p>
+  <button onclick="mark()">Mark Attendance</button>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const STORE = params.get("store");
+    const DRIVER = params.get("driver");
+
+    function mark() {
+      if (!STORE || !DRIVER) {
+        alert("Invalid QR");
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        function(pos) {
+          fetch("YOUR_APPS_SCRIPT_URL", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              store: STORE,
+              driver: DRIVER,
+              lat: pos.coords.latitude,
+              lng: pos.coords.longitude
+            })
+          })
+          .then(() => alert("Attendance recorded"))
+          .catch(() => alert("Submission failed"));
+        },
+        () => alert("Location permission required")
+      );
+    }
+  </script>
+</body>
+</html>
